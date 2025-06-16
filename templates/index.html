@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ポケモン情報</title>
+</head>
+<body>
+    <h1>ポケモン検索</h1>
+    <form method="POST">
+        <input type="text" name="name" placeholder="ピカチュウなど">
+        <button type="submit">検索</button>
+    </form>
+
+    {% if pokemon %}
+        <h2>{{ pokemon.name.title() }}</h2>
+        <img src="{{ pokemon.sprites.front_default }}">
+        <p>高さ: {{ pokemon.height }}</p>
+        <p>重さ: {{ pokemon.weight }}</p>
+    {% endif %}
+</body>
+</html>
