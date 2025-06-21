@@ -2,6 +2,10 @@
 
 ポケモンのポートフォリオを表示するWebアプリケーションです。
 
+## デモURL
+
+[https://poke-api-app-amqy.onrender.com/](https://poke-api-app-amqy.onrender.com/)
+
 ## 機能
 
 - ポケモンの情報表示
@@ -10,42 +14,6 @@
 
 ## 必要条件
 
-- Python 3.8以上
-- pip（Pythonパッケージマネージャー）
-
-## セットアップ方法
-
-1. リポジトリのクローン
-```bash
-git clone https://github.com/your-username/poke-portfolio.git
-cd poke-portfolio
-```
-
-2. 仮想環境の作成と有効化
-```bash
-# Windows
-python -m venv venv
-.\venv\Scripts\activate
-
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. 依存パッケージのインストール
-```bash
-pip install -r requirements.txt
-```
-
-4. アプリケーションの起動
-```bash
-python app.py
-```
-
-5. ブラウザでアクセス
-```
-http://localhost:5000
-```
 
 ## 使用方法
 
@@ -66,11 +34,7 @@ http://localhost:5000
 
 ## 貢献
 
-1. このリポジトリをフォーク
-2. 新しいブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
+
 
 ## 作者
 

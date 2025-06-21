@@ -58,6 +58,36 @@
             margin: 10px 0;
             color: #0066cc;
         }
+        .search-container {
+            position: relative;
+            display: inline-block;
+        }
+        #suggestions-box {
+            display: none;
+            position: absolute;
+            border: 1px solid #ddd;
+            background-color: white;
+            z-index: 1000;
+            width: calc(100% - 2px); /* border分を引く */
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        .search-result-header {
+            color: #555;
+            font-weight: normal;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -65,8 +95,11 @@
     <div class="info">
         <strong>検索方法:</strong> 日本語名（ピカチュウ、リザードンなど）または英語名（pikachu、charizardなど）で検索できます。
     </div>
-    <form method="POST">
-        <input type="text" name="name" placeholder="ピカチュウ、リザードン、pikachuなど" value="{{ request.form.get('name', '') }}">
+    <form method="POST" id="search-form">
+        <div class="search-container">
+            <input type="text" id="pokemon-name" name="name" placeholder="ピカチュウ、リザードン、pikachuなど" value="{{ request.form.get('name', '') }}" autocomplete="off">
+            <div id="suggestions-box"></div>
+        </div>
         <button type="submit">検索</button>
     </form>
 
@@ -78,6 +111,9 @@
 
     {% if pokemon %}
         <div class="pokemon-info">
+            {% if search_term %}
+                <h3 class="search-result-header">「{{ search_term }}」の検索結果</h3>
+            {% endif %}
             <h2>{{ pokemon.name.title() }}</h2>
             <img src="{{ pokemon.sprites.front_default }}" alt="{{ pokemon.name }}" class="pokemon-sprite">
             <p><strong>高さ:</strong> {{ pokemon.height }} dm</p>
@@ -90,14 +126,52 @@
         </div>
     {% endif %}
 
-    <!-- デバッグ情報 -->
-    {% if request.method == "POST" %}
-        <div class="debug">
-            <strong>デバッグ情報:</strong><br>
-            検索クエリ: "{{ request.form.get('name', '') }}"<br>
-            ポケモンデータ: {{ "あり" if pokemon else "なし" }}<br>
-            エラー: {{ "あり" if error else "なし" }}
-        </div>
-    {% endif %}
+    <script>
+        const nameInput = document.getElementById('pokemon-name');
+        const suggestionsBox = document.getElementById('suggestions-box');
+        const searchForm = document.getElementById('search-form');
+
+        nameInput.addEventListener('input', async () => {
+            const query = nameInput.value;
+
+            if (query.length < 1) {
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/suggestions?q=${query}`);
+                const suggestions = await response.json();
+
+                suggestionsBox.innerHTML = '';
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement('div');
+                        div.textContent = suggestion;
+                        div.classList.add('suggestion-item');
+                        div.addEventListener('click', () => {
+                            nameInput.value = suggestion;
+                            suggestionsBox.style.display = 'none';
+                            searchForm.submit();
+                        });
+                        suggestionsBox.appendChild(div);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('サジェストの取得に失敗しました:', error);
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== nameInput) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

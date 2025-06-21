@@ -179,3 +179,21 @@ def get_english_name(japanese_name):
     日本語名から英語名を取得する
     """
     return POKEMON_NAMES.get(japanese_name, japanese_name)
+
+
+def get_suggestions(query):
+    """
+    クエリに部分一致する日本語名の候補を取得する
+    """
+    if not query:
+        return []
+
+    query = query.lower()
+    suggestions = []
+
+    for jp_name in POKEMON_NAMES.keys():
+        if query in jp_name.lower():
+            suggestions.append(jp_name)
+
+    # 重複を削除し、最大10件に制限
+    return list(set(suggestions))[:10]
