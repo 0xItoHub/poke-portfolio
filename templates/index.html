@@ -2,19 +2,102 @@
 <html>
 <head>
     <title>ポケモン情報</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .error {
+            color: red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .pokemon-info {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .pokemon-sprite {
+            max-width: 200px;
+            height: auto;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .debug {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #0066cc;
+        }
+    </style>
 </head>
 <body>
     <h1>ポケモン検索</h1>
+    <div class="info">
+        <strong>検索方法:</strong> 日本語名（ピカチュウ、リザードンなど）または英語名（pikachu、charizardなど）で検索できます。
+    </div>
     <form method="POST">
-        <input type="text" name="name" placeholder="ピカチュウなど">
+        <input type="text" name="name" placeholder="ピカチュウ、リザードン、pikachuなど" value="{{ request.form.get('name', '') }}">
         <button type="submit">検索</button>
     </form>
 
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
     {% if pokemon %}
-        <h2>{{ pokemon.name.title() }}</h2>
-        <img src="{{ pokemon.sprites.front_default }}">
-        <p>高さ: {{ pokemon.height }}</p>
-        <p>重さ: {{ pokemon.weight }}</p>
+        <div class="pokemon-info">
+            <h2>{{ pokemon.name.title() }}</h2>
+            <img src="{{ pokemon.sprites.front_default }}" alt="{{ pokemon.name }}" class="pokemon-sprite">
+            <p><strong>高さ:</strong> {{ pokemon.height }} dm</p>
+            <p><strong>重さ:</strong> {{ pokemon.weight }} hg</p>
+            <p><strong>タイプ:</strong> 
+                {% for type in pokemon.types %}
+                    {{ type.type.name.title() }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
+    <!-- デバッグ情報 -->
+    {% if request.method == "POST" %}
+        <div class="debug">
+            <strong>デバッグ情報:</strong><br>
+            検索クエリ: "{{ request.form.get('name', '') }}"<br>
+            ポケモンデータ: {{ "あり" if pokemon else "なし" }}<br>
+            エラー: {{ "あり" if error else "なし" }}
+        </div>
     {% endif %}
 </body>
 </html>
